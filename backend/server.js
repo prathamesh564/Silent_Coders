@@ -1,33 +1,21 @@
-import express from 'express';
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import quizRouter from "./routes/quizRoutes.js";
+
 const app = express();
-const port = 3000;
+const PORT = 3000;
+
+app.use(cors());
 app.use(express.json());
-const Cars=[
-    {id:1,name: 'Toyota',model:'Camry', year: 2020},
-    {id:2,name:'Honda',model:'Civic', year: 2019},
-    {id:3,name: 'Ford',model:'Mustang', year: 2021}
-]
-app.get('/', (req, res) => {
-    res.send("Hello cars");
-})
-app.get('/cars/:id', (req, res) => {
-    res.json(Cars);
-})
-app.post('/cars', (req, res) => {
-    const newCar = req.body;
-    Cars.push(newCar);
-    res.status(201).json(newCar);
-})
-app.delete('/cars/:id', (req, res) => {
-    const carId = parseInt(req.params.id);
-    const carIndex = Cars.findIndex(car => car.id === carId);
-    if (carIndex !== -1) {
-        Cars.splice(carIndex, 1);
-        res.json({message: `Car with id ${req.params.id} deleted`});
-    } else {
-        res.status(404).json({message: `Car with id ${req.params.id} not found`});
-    }
-})
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-})
+
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("✅ Database Connected"))
+  .catch(err => console.error("❌ DB Connection Error:", err));
+
+app.use("/api/quiz", quizRouter);
+
+app.listen(PORT, () => console.log(`🚀 Server on http://localhost:${PORT}`));
