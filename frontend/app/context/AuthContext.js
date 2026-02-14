@@ -1,29 +1,19 @@
-
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../core/firebase";
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
-  User,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-type AuthContextType = {
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<any>;
-  register: (email: string, password: string) => Promise<any>;
-  logout: () => Promise<void>;
-  createRegister: (profile: any) => Promise<any>;
-};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,15 +24,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsub();
   }, []);
 
-  const login = (email: string, password: string) =>
+  const login = (email, password) =>
     signInWithEmailAndPassword(auth, email, password);
 
-  const register = (email: string, password: string) =>
+  const register = (email, password) =>
     createUserWithEmailAndPassword(auth, email, password);
 
   const logout = () => signOut(auth);
 
-  const createRegister = async (profile: any) => {
+  const createRegister = async (profile) => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error("No user logged in");
 
@@ -72,7 +62,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuth = (): AuthContextType => {
+/* ✅ SAFE HOOK */
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used inside AuthProvider");
