@@ -1,118 +1,121 @@
 "use client";
-
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import Footer from "./components/Footer";
-
-
+import Header from "./components/Header";
 import { 
   Sparkles, 
   ArrowRight, 
-  Briefcase, 
-  LineChart, 
-  Shield 
+  Trophy, 
+  Zap, 
+  BrainCircuit, 
+  Timer,
+  ChevronRight,
+  Sun,
+  Moon
 } from "lucide-react";
-
-export default function LandingPage() {
+export default function QuizLandingPage() {
   const router = useRouter();
+  const [isDark, setIsDark] = useState(true);
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-    
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2 text-slate-900 font-bold text-xl">
-          <div className="w-8 h-8 bg-indigo-600 rounded flex items-center justify-center text-white text-sm">J</div>
-          JobFinder
-        </div>
-        <div className="flex items-center gap-6">
-          <button 
-            onClick={() => router.push("/login")}
-            className="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors"
-          >
-            Sign In
-          </button>
-          <button 
-            onClick={() => router.push("/login")}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all"
-          >
-            Get Started
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-200 flex flex-col font-sans transition-colors duration-300">
+      <Header isDark={isDark} setIsDark={setIsDark} />
 
-     
-      <main className="flex-grow">
-    
-        <section className="relative pt-20 pb-32 px-6 overflow-hidden">
-      
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-96 bg-indigo-100/50 blur-[120px] rounded-full pointer-events-none" />
-
+      <main className="flex-grow">       
+        <section className="relative pt-24 pb-32 px-6">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[500px] bg-indigo-500/10 dark:bg-indigo-600/10 blur-[140px] rounded-full pointer-events-none" />
+          
           <div className="max-w-5xl mx-auto text-center relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold mb-8 uppercase tracking-widest">
-              <Sparkles size={14} />
-              Next-Gen Recruitment
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-300 text-xs font-bold mb-10 uppercase tracking-[0.2em]">
+              <Sparkles size={14} className="animate-pulse" />
+              AI-Powered Assessments
             </div>
             
-            <h1 className="text-6xl lg:text-8xl font-black text-slate-900 leading-tight mb-8">
-              The future of <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">
-                Career Matching.
+            <h1 className="text-6xl lg:text-8xl font-black text-slate-900 dark:text-white leading-[1.1] mb-8 tracking-tight">
+              Master your craft <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 dark:from-indigo-400 dark:via-purple-400 dark:to-pink-400">
+                one question at a time.
               </span>
             </h1>
             
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Connect with opportunities that align with your technical DNA. 
-              Built for developers, analyzed by intelligence, delivered instantly.
+            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+              The ultimate testing ground for modern developers. Battle through real-world 
+              coding scenarios, earn XP, and climb the global ranks.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button 
-                onClick={() => router.push("/login")}
-                className="w-full sm:w-auto bg-slate-900 text-white hover:bg-slate-800 font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-slate-200"
-              >
-                Find Your Match <ArrowRight size={20} />
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
+              <button className="w-full sm:w-auto bg-slate-900 dark:bg-white text-white dark:text-[#0f172a] hover:opacity-90 font-extrabold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl">
+                Explore Quizzes <ArrowRight size={20} />
               </button>
-              <button className="w-full sm:w-auto bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 font-bold px-8 py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm">
-                View All Jobs
+              <button className="w-full sm:w-auto bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800 font-bold px-10 py-4 rounded-2xl flex items-center justify-center gap-2 transition-all backdrop-blur-sm">
+                Daily Challenge
               </button>
             </div>
           </div>
         </section>
 
-        
         <section className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8 pb-32">
           <FeatureCard 
-            icon={<Briefcase className="text-indigo-600" />} 
-            title="Curated Roles" 
-            desc="High-impact positions from top-tier engineering teams."
+            icon={<Zap className="text-amber-500 dark:text-amber-400" />} 
+            title="Rapid Fire Mode" 
+            desc="Test your speed and accuracy under pressure with timed adaptive questions."
           />
           <FeatureCard 
-            icon={<LineChart className="text-blue-600" />} 
-            title="Skill Analysis" 
-            desc="We verify your expertise to bypass basic screening."
+            icon={<Trophy className="text-indigo-600 dark:text-indigo-400" />} 
+            title="Ranked Leagues" 
+            desc="Move from 'Script Kiddie' to 'Legend' as you beat complex engineering trials."
           />
           <FeatureCard 
-            icon={<Shield className="text-emerald-600" />} 
-            title="Direct Access" 
-            desc="No recruiters in the middle. Talk directly to hiring managers."
+            icon={<Timer className="text-emerald-600 dark:text-emerald-400" />} 
+            title="Real-time Insights" 
+            desc="Detailed post-quiz analytics showing your strengths and knowledge gaps."
           />
+        </section>
+
+        {/* Categories Preview */}
+        <section className="bg-slate-200/50 dark:bg-slate-900/30 border-y border-slate-200 dark:border-slate-800/50 py-24 mb-32">
+          <div className="max-w-7xl mx-auto px-6">
+             <div className="flex justify-between items-end mb-12">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Popular Categories</h2>
+                  <p className="text-slate-500 dark:text-slate-400">Pick a topic and start proving your skills.</p>
+                </div>
+                <button className="text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1 hover:underline transition-all">
+                  View all <ChevronRight size={18} />
+                </button>
+             </div>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {['React.js', 'System Design', 'Python', 'AWS Cloud'].map((tech) => (
+                  <div key={tech} className="p-6 rounded-xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 hover:border-indigo-500 transition-all cursor-pointer group">
+                    <span className="text-slate-700 dark:text-white font-bold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{tech}</span>
+                  </div>
+                ))}
+             </div>
+          </div>
         </section>
       </main>
 
-  
       <Footer />
     </div>
   );
 }
 
-
 function FeatureCard({ icon, title, desc }) {
   return (
-    <div className="bg-white border border-slate-200 p-8 rounded-2xl hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group">
-      <div className="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center mb-6 border border-slate-100 group-hover:scale-110 transition-transform">
+    <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-8 rounded-3xl hover:border-indigo-500/50 hover:shadow-xl dark:hover:bg-indigo-500/[0.02] transition-all group">
+      <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mb-6 border border-slate-200 dark:border-slate-700 group-hover:scale-110 group-hover:bg-white dark:group-hover:bg-slate-700 transition-all duration-300">
         {icon}
       </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-      <p className="text-slate-500 leading-relaxed text-sm">{desc}</p>
+      <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">{title}</h3>
+      <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">{desc}</p>
     </div>
   );
 }
