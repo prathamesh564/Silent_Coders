@@ -7,6 +7,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Sun, Moon } from "lucide-react"; 
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 function QuizContent() {
   const [questions, setQuestions] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -35,7 +37,7 @@ function QuizContent() {
       try {
         const user = auth.currentUser;
         if (!user) return;
-        const res = await fetch(`http://localhost:5000/api/quiz/generate?topic=${encodeURIComponent(topic)}&userId=${user.uid}`);
+        const res = await fetch(`${API_URL}/api/quiz/generate?topic=${encodeURIComponent(topic)}&userId=${user.uid}`);
         const data = await res.json();
         if (Array.isArray(data)) setQuestions(data);
       } catch (err) {
@@ -51,7 +53,7 @@ function QuizContent() {
     setLoading(true);
     try {
       const user = auth.currentUser;
-      const res = await fetch("http://localhost:5000/api/quiz/submit", {
+      const res = await fetch(`${API_URL}/api/quiz/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

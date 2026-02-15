@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Trophy, Target, TrendingUp, Loader2, Award, AlertCircle } from "lucide-react";
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function ResultsPage() {
   const { user, loading: authLoading } = useAuth();
   const [leaderboard, setLeaderboard] = useState([]);
@@ -17,7 +17,7 @@ export default function ResultsPage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("http://localhost:5000/api/quiz/leaderboard");
+        const response = await fetch(`${API_URL}/api/quiz/leaderboard`);
         if (!response.ok) throw new Error("Backend Server is unreachable.");
         
         const data = await response.json();
