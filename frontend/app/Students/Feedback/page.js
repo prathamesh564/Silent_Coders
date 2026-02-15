@@ -3,15 +3,14 @@
 import React, { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useRouter } from "next/navigation"; // Added for redirection
+import { useRouter } from "next/navigation"; 
 import { MessageSquare, Send, History, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 
 export default function FacultyFeedbackPage() {
   const [feedback, setFeedback] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const router = useRouter(); // Initialize router
+  const router = useRouter(); 
 
-  // Static mock data for previous history
   const history = [
     { id: 1, date: "2024-05-10", status: "Resolved", text: "Need more math templates for Quiz 3." },
     { id: 2, date: "2024-05-12", status: "Pending", text: "Dashboard loading time is slightly high during peak hours." },
