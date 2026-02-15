@@ -77,7 +77,7 @@ export default function ResultsPage() {
   );
 
   return (
-    <div className="min-h-screen w-full bg-[#020617] text-slate-200 font-sans flex flex-col">
+    <div className="min-h-screen w-full dark:bg-[#020617] bg-gray-200 text-slate-200 font-sans flex flex-col">
       <Header />
       
       <main className="flex-1 max-w-5xl mx-auto w-full py-12 px-4 space-y-8">
