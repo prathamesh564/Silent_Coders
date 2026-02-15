@@ -167,7 +167,7 @@ function QuizContent() {
                 Finish Quiz
               </button>
 
-              {showFeedback && (
+              {/* {showFeedback && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                 <div className="bg-slate-900 p-6 rounded-2xl w-96">
                   <h3 className="text-xl font-bold text-white mb-4">Quick Feedback</h3>
@@ -198,7 +198,13 @@ function QuizContent() {
                   </div>
                 </div>
               </div>
-                    )}
+                    )} */}
+                    <feedback
+        show={showFeedback}
+        setShow={setShowFeedback}
+        feedback={feedback}
+        setFeedback={setFeedback}
+      />
             </>
            ) : (
             <button 
