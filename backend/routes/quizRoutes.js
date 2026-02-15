@@ -1,28 +1,48 @@
 import express from "express";
 import { generateAIQuestions } from "../services/gemini.js";
 import { Result } from "../models/Result.js";
+// Import the static data you defined earlier
+import { staticQuizzes } from "../data/staticQuizzes.js"; 
 
 const router = express.Router();
-let activeQuizzes = {}; // Temporary session storage
+let activeQuizzes = {}; 
 
-// 1. GET: Generate Quiz (Topic-based)
 router.get("/generate", async (req, res) => {
   const { topic, userId } = req.query;
   if (!topic || !userId) return res.status(400).json({ error: "Topic and userId required" });
 
   try {
-    const questions = await generateAIQuestions(topic);
-    activeQuizzes[userId] = { questions, topic };
+    let questions;
+    
+    // Normalize the topic: trim spaces and make it lowercase
+    const normalizedTopic = topic.trim().toLowerCase();
 
-    // Send questions without answers to prevent cheating
-    const clientQuestions = questions.map(({ answer, ...rest }) => rest);
-    res.json(clientQuestions);
+    // LOGIC: Check static data first
+    if (normalizedTopic === "quiz1") {
+      console.log("✅ Serving Static Quiz 1");
+      questions = staticQuizzes.quiz1;
+    } 
+    else if (normalizedTopic === "quiz2") {
+      console.log("✅ Serving Static Quiz 2");
+      questions = staticQuizzes.quiz2;
+    } 
+    else {
+      // ONLY call Gemini if it is NOT quiz1 or quiz2
+      console.log(`🤖 Calling Gemini for AI Topic: ${topic}`);
+      questions = await generateAIQuestions(topic);
+    }
+
+    // Save session and remove answers for client-side security
+    activeQuizzes[userId] = { questions, topic };
+    const clientSafeQuestions = questions.map(({ answer, ...rest }) => rest);
+    
+    res.json(clientSafeQuestions);
   } catch (e) {
-    res.status(500).json({ error: "Failed to generate quiz" });
+    console.error("Route Error:", e.message);
+    res.status(500).json({ error: "Failed to load quiz" });
   }
 });
-
-// 2. POST: Submit and Save to Leaderboard
+// 2. POST: Submit (Remains the same)
 router.post("/submit", async (req, res) => {
   const { userId, username, answers } = req.body;
   const session = activeQuizzes[userId];
@@ -56,18 +76,18 @@ router.post("/submit", async (req, res) => {
       category: session.topic
     });
 
-    delete activeQuizzes[userId]; // Clear session memory
+    delete activeQuizzes[userId]; 
     res.json({ score, total: session.questions.length, percentage: percentage + "%", details, recordId: record._id });
   } catch (err) {
     res.status(500).json({ error: "Database save failed" });
   }
 });
 
-// 3. GET: Rank-based Leaderboard
+// 3. GET: Leaderboard (Remains the same)
 router.get("/leaderboard", async (req, res) => {
   try {
     const list = await Result.find()
-      .sort({ score: -1, percentage: -1, timestamp: 1 }) // Rank by score, then %, then time
+      .sort({ score: -1, percentage: -1, timestamp: 1 }) 
       .limit(15);
     res.json(list);
   } catch (err) {

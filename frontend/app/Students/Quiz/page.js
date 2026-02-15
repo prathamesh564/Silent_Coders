@@ -1,16 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { auth, db } from "../../core/firebase.js";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function QuizPage() {
+// Sub-component to handle search params
+function QuizContent() {
   const [questions, setQuestions] = useState([]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null);
   const router = useRouter();
+  
+  // Logic: Get topic from URL (e.g., ?topic=quiz1 or ?topic=Python)
+  const searchParams = useSearchParams();
+  const topic = searchParams.get("topic") || "General";
 
   useEffect(() => {
     const loadQuiz = async () => {
@@ -18,10 +23,10 @@ export default function QuizPage() {
         const user = auth.currentUser;
         if (!user) return;
         
-        const res = await fetch(`http://localhost:5000/api/quiz/generate?topic=DSA&userId=${user.uid}`);
+        // Dynamic Fetch: Uses the 'topic' from URL
+        const res = await fetch(`http://localhost:5000/api/quiz/generate?topic=${encodeURIComponent(topic)}&userId=${user.uid}`);
         const data = await res.json();
         
-        // Ensure data is an array before setting state
         if (Array.isArray(data)) {
           setQuestions(data);
         } else {
@@ -34,7 +39,7 @@ export default function QuizPage() {
       }
     };
     loadQuiz();
-  }, []);
+  }, [topic]);
 
   const submitQuiz = async () => {
     setLoading(true);
@@ -52,11 +57,12 @@ export default function QuizPage() {
       const data = await res.json();
       setResult(data);
 
+      // Logic: Save history using the dynamic category
       await updateDoc(doc(db, "students", user.uid), {
         quizHistory: arrayUnion({
           date: new Date().toISOString(),
           percentage: data.percentage,
-          category: "DSA"
+          category: topic 
         })
       });
     } catch (err) {
@@ -66,39 +72,38 @@ export default function QuizPage() {
     }
   };
 
-  // 1. Loading State Guard
   if (loading) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p>Generating Quiz...</p>
+          <p>Preparing your {topic} quiz...</p>
         </div>
       </div>
     );
   }
 
-  // 2. Result View
   if (result) {
     return (
-      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center text-white">
-        <h1 className="text-5xl font-bold text-blue-500 mb-4">{result.percentage}</h1>
-        <p className="text-slate-400 mb-8">Great job! Your results have been saved.</p>
-        <button onClick={() => router.push("/Students/dashboard")} className="bg-blue-600 px-8 py-3 rounded-xl font-bold hover:bg-blue-500 transition">
-          Go Home
-        </button>
+      <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center text-white p-4 text-center">
+        <div className="bg-slate-900/50 p-10 rounded-3xl border border-slate-800 shadow-2xl max-w-md w-full">
+          <h2 className="text-slate-400 uppercase tracking-widest text-sm mb-2">Quiz Completed</h2>
+          <h1 className="text-6xl font-black text-blue-500 mb-4">{result.percentage}</h1>
+          <p className="text-slate-400 mb-8">Great job! Your results for <b>{topic}</b> have been saved to your profile.</p>
+          <button onClick={() => router.push("/Students/dashboard")} className="w-full bg-blue-600 py-4 rounded-xl font-bold hover:bg-blue-500 transition shadow-lg shadow-blue-900/20">
+            Return to Dashboard
+          </button>
+        </div>
       </div>
     );
   }
 
-  // 3. Question Data Guard
   const q = questions[currentIdx];
 
-  // If loading is done but no questions exist, show an error instead of crashing
   if (!q) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white">
-        <p>No questions available. Please refresh or try again later.</p>
+        <p>No questions available for {topic}. Please try another topic.</p>
       </div>
     );
   }
@@ -106,10 +111,17 @@ export default function QuizPage() {
   return (
     <div className="min-h-screen bg-[#020617] text-white p-6 md:p-10">
       <div className="max-w-xl mx-auto bg-slate-900/50 p-8 rounded-2xl border border-slate-800 shadow-xl">
-        {/* Progress header */}
-        <div className="flex justify-between text-sm text-slate-500 mb-4">
-           <span>Question {currentIdx + 1} of {questions.length}</span>
-           <span>{Math.round(((currentIdx + 1) / questions.length) * 100)}%</span>
+        <div className="flex justify-between items-center mb-6">
+           <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-tighter border border-blue-500/20">{topic}</span>
+           <div className="text-right">
+             <span className="block text-sm text-slate-500">Question {currentIdx + 1} of {questions.length}</span>
+             <div className="w-32 h-1 bg-slate-800 rounded-full mt-2">
+                <div 
+                  className="h-full bg-blue-500 rounded-full transition-all duration-300" 
+                  style={{ width: `${((currentIdx + 1) / questions.length) * 100}%` }}
+                ></div>
+             </div>
+           </div>
         </div>
 
         <h2 className="text-xl font-semibold mb-8 leading-relaxed">{q.question}</h2>
@@ -160,5 +172,18 @@ export default function QuizPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main component wrapped in Suspense (required for useSearchParams in Next.js)
+export default function QuizPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white">
+        <p>Loading Quiz Environment...</p>
+      </div>
+    }>
+      <QuizContent />
+    </Suspense>
   );
 }

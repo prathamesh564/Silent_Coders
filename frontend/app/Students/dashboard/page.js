@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function StudentDashboard() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [aiTopic, setAiTopic] = useState(""); 
   const router = useRouter();
 
   useEffect(() => {
@@ -26,6 +27,15 @@ export default function StudentDashboard() {
     });
     return () => unsubscribe();
   }, [router]);
+
+  // Logic: Ensure AI topic isn't just whitespace
+  const startQuiz = (topic) => {
+    let selectedTopic = topic;
+    if (topic === "AI") {
+      selectedTopic = aiTopic.trim() || "General Programming";
+    }
+    router.push(`/Students/Quiz?topic=${encodeURIComponent(selectedTopic)}`);
+  };
 
   if (loading) {
     return (
@@ -49,25 +59,48 @@ export default function StudentDashboard() {
           </nav>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 p-4 md:p-10 bg-[#020617]">
           <header className="flex justify-between items-center mb-10">
             <div>
               <h1 className="text-3xl font-bold text-white">
                 Welcome back, {profile?.name?.split(" ")[0]}! 👋
               </h1>
-              <p className="text-slate-400">Here is what's happening with your learning today.</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <button className="bg-slate-800 p-2 rounded-full hover:bg-slate-700 transition">
-                <span className="sr-only">Notifications</span>
-                🔔
-              </button>
-              <div className="w-10 h-10 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full border-2 border-slate-800"></div>
+              <p className="text-slate-400">Choose a quiz to start your session.</p>
             </div>
           </header>
 
-          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            {/* Quiz 1 Card */}
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl hover:border-blue-500/50 transition-all">
+              <div className="text-2xl mb-2">📚</div>
+              <h3 className="text-lg font-bold text-white">Quiz 1</h3>
+              <p className="text-sm text-slate-400 mb-4">Core JS & Data Structures</p>
+              <button onClick={() => startQuiz("quiz1")} className="w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">Start Quiz</button>
+            </div>
+
+            {/* Quiz 2 Card */}
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl hover:border-blue-500/50 transition-all">
+              <div className="text-2xl mb-2">⚡</div>
+              <h3 className="text-lg font-bold text-white">Quiz 2</h3>
+              <p className="text-sm text-slate-400 mb-4">React & Backend Concepts</p>
+              <button onClick={() => startQuiz("quiz2")} className="w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">Start Quiz</button>
+            </div>
+
+            {/* Gemini AI Card - UPDATED WITH INPUT */}
+            <div className="bg-slate-900/40 border border-purple-500/30 p-6 rounded-2xl hover:border-purple-500/60 transition-all bg-gradient-to-br from-purple-500/5 to-transparent">
+              <div className="text-2xl mb-2">🤖</div>
+              <h3 className="text-lg font-bold text-white">AI Custom Quiz</h3>
+              <input 
+                type="text"
+                placeholder="Topic (e.g. Python, SQL)"
+                value={aiTopic}
+                onChange={(e) => setAiTopic(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 mt-2 mb-3 text-sm focus:border-purple-500 focus:outline-none text-slate-200"
+              />
+              <button onClick={() => startQuiz("AI")} className="w-full py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-semibold transition">Generate AI Quiz</button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <StatCard title="Quizzes Completed" value={profile?.quizHistory?.length || 0} icon="📝" color="blue" />
             <StatCard title="Average Score" value={calculateAverage(profile?.quizHistory)} icon="📈" color="green" />
@@ -111,10 +144,6 @@ export default function StudentDashboard() {
                 <InfoItem label="College" value={profile?.college} />
                 <InfoItem label="Branch" value={profile?.branch} />
                 <InfoItem label="Stream" value={profile?.stream} />
-                <hr className="border-slate-800 my-4" />
-                <Link href="/Students/Quiz" className="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-blue-900/20">
-                  Start New Quiz
-                </Link>
               </div>
             </div>
           </div>
@@ -124,10 +153,10 @@ export default function StudentDashboard() {
   );
 }
 
-// Reusable NavLink, StatCard, and InfoItem components remain the same as your previous version...
+// Sub-components NavLink, StatCard, InfoItem, calculateAverage remain the same
 function NavLink({ href, children, active = false }) {
   return (
-    <Link href={href} className={`block px-4 py-2 rounded-lg transition-all ${active ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}>
+    <Link href={href} className={`block px-4 py-2 rounded-lg transition-all ${active ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}>
       {children}
     </Link>
   );
