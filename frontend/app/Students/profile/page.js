@@ -6,12 +6,12 @@ import { db } from "../../core/firebase";
 import { useRouter } from "next/navigation";
 import { 
   doc, 
-  getDoc, 
-  updateDoc, 
+  setDoc, // Changed from updateDoc to setDoc for new user support
   collection, 
   query, 
   where, 
-  getDocs 
+  getDocs,
+  onSnapshot // Added for real-time updates
 } from "firebase/firestore";
 import { 
   User, 
@@ -45,58 +45,85 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    async function fetchData() {
-      if (!user) return;
-      try {
-        const docRef = doc(db, "profiles", user.uid);
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setProfile(data);
-          setEditForm({
-            name: data.name || "",
-            usn: data.usn || "",
-            dept: data.dept || "",
-            course: data.course || "",
-            college: data.college || "",
-            phoneNumber: data.phoneNumber || ""
-          });
-        }
+    // Prevent execution if auth is still loading or user isn't logged in
+    if (authLoading) return;
+    if (!user) {
+      router.push("/Students/login");
+      return;
+    }
 
+    setLoading(true);
+
+    // 1. Setup Real-time Listener for Profile
+    const profileRef = doc(db, "profiles", user.uid);
+    const unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setProfile(data);
+        setEditForm({
+          name: data.name || "",
+          usn: data.usn || "",
+          dept: data.dept || "",
+          course: data.course || "",
+          college: data.college || "",
+          phoneNumber: data.phoneNumber || ""
+        });
+      } else {
+        // Handle case where user exists in Auth but has no Firestore document yet
+        setProfile({}); 
+      }
+      setLoading(false);
+    }, (err) => {
+      console.error("Firestore Permission/Fetch Error:", err);
+      setLoading(false);
+    });
+
+    // 2. Fetch Applications (One-time fetch or you could use onSnapshot here too)
+    const fetchApplications = async () => {
+      try {
         const q = query(collection(db, "applications"), where("userId", "==", user.uid));
         const querySnapshot = await getDocs(q);
         const apps = querySnapshot.docs.map(doc => ({ 
           id: doc.id, 
           ...doc.data() 
         }));
-        setAppliedJobs(apps.sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt)));
-
+        setAppliedJobs(apps.sort((a, b) => {
+          const dateA = a.appliedAt?.seconds ? a.appliedAt.seconds * 1000 : new Date(a.appliedAt);
+          const dateB = b.appliedAt?.seconds ? b.appliedAt.seconds * 1000 : new Date(b.appliedAt);
+          return dateB - dateA;
+        }));
       } catch (err) {
-        console.error("Fetch Error:", err);
-      } finally {
-        setLoading(false);
+        console.error("Applications Fetch Error:", err);
       }
-    }
-    fetchData();
-  }, [user]);
+    };
+
+    fetchApplications();
+
+    // 3. Cleanup listener on unmount
+    return () => unsubscribeProfile();
+  }, [user, authLoading, router]);
 
   async function handleUpdate() {
     try {
       const docRef = doc(db, "profiles", user.uid);
       const updatedData = {
-        ...profile,
+        // We don't spread ...profile here to avoid polluting with nulls on first save
         name: editForm.name,
         usn: editForm.usn.toUpperCase(),
         dept: editForm.dept,
         course: editForm.course,
         college: editForm.college,
         phoneNumber: editForm.phoneNumber,
+        updatedAt: new Date().toISOString()
       };
-      await updateDoc(docRef, updatedData);
-      setProfile(updatedData);
+
+      // setDoc with merge: true handles both creating new docs AND updating existing ones
+      await setDoc(docRef, updatedData, { merge: true });
+      
       setIsEditing(false);
+      // setProfile(updatedData); // Not strictly needed as onSnapshot will update this for us
     } catch (err) {
+      console.error("Update failed:", err);
       alert("Update failed: " + err.message);
     }
   }
@@ -113,16 +140,17 @@ export default function ProfilePage() {
       <Header/>
       <div className="max-w-6xl mx-auto space-y-8 mt-10">
         
+        {/* Profile Header Card */}
         <div className="bg-white/70 dark:bg-slate-800/50 backdrop-blur-xl border border-white dark:border-slate-700 rounded-[2.5rem] p-8 shadow-xl dark:shadow-none flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 bg-[#6366F1] rounded-[2rem] flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20">
               {profile?.name?.[0] || "U"}
             </div>
             <div>
-              <h1 className="text-3xl font-black text-[#1E293B] dark:text-white tracking-tight">{profile?.name}</h1>
+              <h1 className="text-3xl font-black text-[#1E293B] dark:text-white tracking-tight">{profile?.name || "New User"}</h1>
               <div className="flex items-center gap-2">
                 <span className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider border border-indigo-100 dark:border-indigo-800">
-                  {profile?.usn}
+                  {profile?.usn || "No USN"}
                 </span>
                 <span className="text-slate-400 dark:text-slate-500 font-bold text-sm">{profile?.course}</span>
               </div>
@@ -136,7 +164,7 @@ export default function ProfilePage() {
             >
               {isEditing ? <><Save size={16}/> Save Profile</> : <><Edit3 size={16}/> Edit Details</>}
             </button>
-            <button onClick={() => router.push("/Students/login")} className="p-3 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 rounded-2xl hover:bg-red-500 dark:hover:bg-red-500 hover:text-white transition-all">
+            <button onClick={logout} className="p-3 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 rounded-2xl hover:bg-red-500 dark:hover:bg-red-500 hover:text-white transition-all">
               <LogOut size={20} />
             </button>
           </div>
@@ -144,6 +172,7 @@ export default function ProfilePage() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           
+          {/* Information Column */}
           <div className="space-y-6">
             <div className="bg-white/50 dark:bg-slate-800/40 backdrop-blur-md border border-white dark:border-slate-700 rounded-[2.5rem] p-8 shadow-lg dark:shadow-none">
               <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
@@ -161,6 +190,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Activity Column */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white/60 dark:bg-slate-800/40 backdrop-blur-md border border-white dark:border-slate-700 rounded-[2.5rem] p-8 md:p-10 shadow-lg dark:shadow-none min-h-[500px]">
               <div className="flex items-center justify-between mb-10">
@@ -183,7 +213,7 @@ export default function ProfilePage() {
                     <div key={app.id} className="group bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-6 rounded-[2rem] flex items-center justify-between hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xl transition-all duration-300">
                       <div className="flex items-center gap-6">
                         <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-900/30 text-[#6366F1] dark:text-indigo-400 rounded-2xl flex items-center justify-center font-black text-xl">
-                          {app.company?.[0]}
+                          {app.company?.[0] || app.jobTitle?.[0]}
                         </div>
                         <div>
                           <h4 className="font-black text-[#1E293B] dark:text-white text-lg leading-tight">{app.jobTitle}</h4>
@@ -192,7 +222,7 @@ export default function ProfilePage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase flex items-center gap-1.5">
-                          <Calendar size={12} /> {new Date(app.appliedAt).toLocaleDateString()}
+                          <Calendar size={12} /> {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : 'N/A'}
                         </span>
                         <ChevronRight size={18} className="text-slate-300 dark:text-slate-600 group-hover:translate-x-1 transition-all" />
                       </div>

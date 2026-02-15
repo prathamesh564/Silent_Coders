@@ -144,6 +144,12 @@ export default function StudentDashboard() {
                 <InfoItem label="College" value={profile?.college} />
                 <InfoItem label="Branch" value={profile?.branch} />
                 <InfoItem label="Stream" value={profile?.stream} />
+                 <button 
+            onClick={() => router.push("/Students/profile")} 
+            className="bg-indigo-600 hover:bg-emerald-500 text-white px-5 py-2.5 border rounded-full text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all"
+          >
+            Profile
+          </button>
               </div>
             </div>
           </div>

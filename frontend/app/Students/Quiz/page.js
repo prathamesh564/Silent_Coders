@@ -3,7 +3,8 @@ import { useState, useEffect, Suspense } from "react";
 import { auth, db } from "../../core/firebase.js";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 // Sub-component to handle search params
 function QuizContent() {
   const [questions, setQuestions] = useState([]);
@@ -75,6 +76,7 @@ function QuizContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center text-white">
+        <Header />
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p>Preparing your {topic} quiz...</p>
@@ -171,6 +173,7 @@ function QuizContent() {
            )}
         </div>
       </div>
+      <div className="mt-10" ><Footer/></div>
     </div>
   );
 }

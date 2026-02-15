@@ -18,4 +18,12 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use("/api/quiz", quizRouter);
 
+app.get("/api/results", async (req, res) => {
+  try {
+    const results = await Result.find().sort({ timestamp: -1 });
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching results" });
+  }
+});
 app.listen(PORT, () => console.log(`🚀 Server on http://localhost:${PORT}`));
