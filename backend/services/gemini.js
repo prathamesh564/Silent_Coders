@@ -6,7 +6,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function generateAIQuestions(topic) {
   try {
-    // Using gemini-1.5-flash-latest for stability
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const prompt = `You are an expert technical examiner. Generate 5 multiple-choice questions about: ${topic}.
