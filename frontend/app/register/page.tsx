@@ -62,8 +62,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen relative bg-gradient-to-b from-[#f6fbff] via-[#f3f9ff] to-white flex items-start justify-center py-16 px-6">
-      {/* top-left logo (matches homepage feel) */}
+    <div className="min-h-screen relative flex items-start justify-center py-16 px-6">
+      {/* animated glow blobs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+      </div>
+
+      {/* top-left logo */}
       <a href="/" className="fixed top-6 left-6 z-50 flex items-center gap-3">
         <img
           src="/logo.png"
@@ -78,10 +84,9 @@ export default function RegisterPage() {
         </span>
       </a>
 
-      {/* Center card */}
-      <div className="w-full max-w-xl">
+      {/* card */}
+      <div className="w-full max-w-xl relative z-10">
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-[0_15px_40px_rgba(20,21,33,0.08)] p-8 md:p-12 border border-white/40">
-          {/* Header */}
           <div className="text-center mb-6">
             <h1 className="font-extrabold tracking-tight text-slate-900">
               <span className="block text-2xl md:text-3xl">Let’s Get You</span>
@@ -96,7 +101,6 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Error */}
           {error && (
             <div className="mb-4 p-3 rounded-md bg-red-50 text-red-700 text-sm">
               {error}
@@ -110,7 +114,7 @@ export default function RegisterPage() {
               value={formData.usn}
               onChange={handleChange}
               required
-              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
             />
 
             <input
@@ -119,7 +123,7 @@ export default function RegisterPage() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -129,7 +133,7 @@ export default function RegisterPage() {
                 value={formData.branch}
                 onChange={handleChange}
                 required
-                className="p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+                className="p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
               />
               <input
                 name="stream"
@@ -137,7 +141,7 @@ export default function RegisterPage() {
                 value={formData.stream}
                 onChange={handleChange}
                 required
-                className="p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+                className="p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
               />
             </div>
 
@@ -147,7 +151,7 @@ export default function RegisterPage() {
               value={formData.college}
               onChange={handleChange}
               required
-              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
             />
 
             <input
@@ -157,7 +161,7 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               pattern="[0-9]{10}"
-              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
             />
 
             <input
@@ -167,7 +171,7 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
             />
 
             <input
@@ -178,13 +182,13 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
               minLength={6}
-              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#6f3af7]/40 transition"
+              className="w-full p-3 rounded-lg border border-slate-200 text-black placeholder-slate-500 focus:outline-none input-glow transition"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="mt-3 w-full inline-flex items-center justify-center gap-3 rounded-lg py-3 bg-gradient-to-r from-[#5b4bff] via-[#6f3af7] to-[#ff5fb4] text-white font-semibold shadow-md hover:scale-[1.01] transform transition"
+              className="mt-3 w-full inline-flex items-center justify-center gap-3 rounded-lg py-3 bg-gradient-to-r from-[#5b4bff] via-[#6f3af7] to-[#ff5fb4] text-white font-semibold shadow-md hover:scale-[1.01] transform transition button-glow"
             >
               {loading ? (
                 <svg
@@ -219,7 +223,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {/* SUCCESS OVERLAY */}
+      {/* success overlay */}
       {success && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="bg-white/95 backdrop-blur-md rounded-lg p-8 shadow-2xl w-80 flex flex-col items-center animate-scaleIn">
@@ -250,6 +254,63 @@ export default function RegisterPage() {
       )}
 
       <style jsx>{`
+        /* blob shapes */
+        .blob {
+          position: absolute;
+          border-radius: 9999px;
+          filter: blur(70px);
+          opacity: 0.55;
+          transform: translate3d(0, 0, 0);
+          mix-blend-mode: normal;
+        }
+        .blob-1 {
+          width: 520px;
+          height: 520px;
+          left: -220px;
+          top: -180px;
+          background: radial-gradient(circle at 20% 20%, rgba(91,75,255,0.28), rgba(111,58,247,0.18) 30%, rgba(255,95,180,0.06) 65%, transparent 70%);
+          animation: float1 8s ease-in-out infinite;
+        }
+        .blob-2 {
+          width: 420px;
+          height: 420px;
+          right: -160px;
+          bottom: -140px;
+          background: radial-gradient(circle at 80% 80%, rgba(255,95,180,0.18), rgba(111,58,247,0.12) 35%, rgba(91,75,255,0.06) 65%, transparent 70%);
+          animation: float2 10s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+          0% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(20px) rotate(6deg); }
+          100% { transform: translateY(0) rotate(0deg); }
+        }
+        @keyframes float2 {
+          0% { transform: translateY(0) rotate(0deg); }
+          50% { transform: translateY(-18px) rotate(-6deg); }
+          100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        /* input focus glow */
+        .input-glow {
+          transition: box-shadow 220ms ease, transform 160ms ease;
+        }
+        .input-glow:focus {
+          box-shadow: 0 10px 30px rgba(111,58,247,0.12), 0 1px 0 rgba(111,58,247,0.04) inset;
+          transform: translateY(-1px);
+        }
+
+        /* button glow on hover */
+        .button-glow {
+          transition: box-shadow 220ms ease, transform 160ms ease;
+          will-change: transform;
+        }
+        .button-glow:hover {
+          box-shadow: 0 10px 40px rgba(111,58,247,0.18), 0 2px 8px rgba(255,95,180,0.08);
+          transform: translateY(-3px) scale(1.01);
+        }
+
+        /* success scale animation */
         @keyframes scaleIn {
           from {
             transform: scale(0.9);
