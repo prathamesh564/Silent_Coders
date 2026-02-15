@@ -77,6 +77,7 @@ export default function StudentDashboard() {
             <NavLink href="/Students/Quiz" theme={theme}>Take Quiz</NavLink>
             <NavLink href="/Students/results" theme={theme}>My Results</NavLink>
             <NavLink href="/Students/login" theme={theme}>Logout</NavLink>
+            <NavLink href="/Students/Feedback" theme={theme}>Feedback</NavLink>
             <NavLink href="/Landing-page" theme={theme}>Home</NavLink>
           </nav>
         </aside>
