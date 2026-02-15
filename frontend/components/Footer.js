@@ -36,7 +36,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Socials Column */}
           <div>
             <h4 className="font-bold text-slate-900 mb-4 text-sm dark:text-slate-400">Connect</h4>
             <div className="flex gap-4">

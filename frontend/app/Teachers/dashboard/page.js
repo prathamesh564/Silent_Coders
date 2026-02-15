@@ -102,7 +102,7 @@ export default function FacultyDashboard() {
             </button>
           </header>
 
-          {/* Aggregate Stats calculated in Frontend */}
+         
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
             <StatCard title="Total Students" value={studentsData.length} icon={<Users size={20}/>} color="blue" themeClasses={themeClasses} />
             <StatCard title="Class Average" value={classAvg()} icon={<GraduationCap size={20}/>} color="green" themeClasses={themeClasses} />
@@ -111,7 +111,7 @@ export default function FacultyDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Raw Student Data Table */}
+           
             <div className={`lg:col-span-2 border rounded-2xl p-6 ${themeClasses.card}`}>
               <h3 className={`text-xl font-bold mb-6 ${themeClasses.headerText}`}>Student Performance</h3>
               <div className="overflow-x-auto">
@@ -147,8 +147,6 @@ export default function FacultyDashboard() {
                 </table>
               </div>
             </div>
-
-            {/* Incharge Profile Info */}
             <div className={`border rounded-2xl p-6 ${themeClasses.card}`}>
               <h3 className={`text-xl font-bold mb-6 ${themeClasses.headerText}`}>Faculty Identity</h3>
               <div className="space-y-4">
@@ -167,8 +165,7 @@ export default function FacultyDashboard() {
     </div>
   );
 }
-
-// Sub-components kept similar but styled for Faculty 
+ 
 function NavLink({ href, children, active = false, theme }) {
   const activeClass = "bg-indigo-600 text-white shadow-lg";
   const inactiveClass = theme === "dark" 

@@ -6,12 +6,12 @@ import { db } from "../../core/firebase";
 import { useRouter } from "next/navigation";
 import { 
   doc, 
-  setDoc, // Changed from updateDoc to setDoc for new user support
+  setDoc, 
   collection, 
   query, 
   where, 
   getDocs,
-  onSnapshot // Added for real-time updates
+  onSnapshot
 } from "firebase/firestore";
 import { 
   User, 
@@ -45,7 +45,6 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    // Prevent execution if auth is still loading or user isn't logged in
     if (authLoading) return;
     if (!user) {
       router.push("/Students/login");
@@ -54,7 +53,6 @@ export default function ProfilePage() {
 
     setLoading(true);
 
-    // 1. Setup Real-time Listener for Profile
     const profileRef = doc(db, "profiles", user.uid);
     const unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -69,7 +67,7 @@ export default function ProfilePage() {
           phoneNumber: data.phoneNumber || ""
         });
       } else {
-        // Handle case where user exists in Auth but has no Firestore document yet
+      
         setProfile({}); 
       }
       setLoading(false);
@@ -77,8 +75,6 @@ export default function ProfilePage() {
       console.error("Firestore Permission/Fetch Error:", err);
       setLoading(false);
     });
-
-    // 2. Fetch Applications (One-time fetch or you could use onSnapshot here too)
     const fetchApplications = async () => {
       try {
         const q = query(collection(db, "applications"), where("userId", "==", user.uid));
@@ -99,7 +95,6 @@ export default function ProfilePage() {
 
     fetchApplications();
 
-    // 3. Cleanup listener on unmount
     return () => unsubscribeProfile();
   }, [user, authLoading, router]);
 
@@ -107,7 +102,6 @@ export default function ProfilePage() {
     try {
       const docRef = doc(db, "profiles", user.uid);
       const updatedData = {
-        // We don't spread ...profile here to avoid polluting with nulls on first save
         name: editForm.name,
         usn: editForm.usn.toUpperCase(),
         dept: editForm.dept,
@@ -117,11 +111,9 @@ export default function ProfilePage() {
         updatedAt: new Date().toISOString()
       };
 
-      // setDoc with merge: true handles both creating new docs AND updating existing ones
       await setDoc(docRef, updatedData, { merge: true });
       
       setIsEditing(false);
-      // setProfile(updatedData); // Not strictly needed as onSnapshot will update this for us
     } catch (err) {
       console.error("Update failed:", err);
       alert("Update failed: " + err.message);
@@ -139,8 +131,7 @@ export default function ProfilePage() {
          style={{ backgroundImage: "linear-gradient(135deg, rgba(207, 217, 244, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%)" }}>
       <Header/>
       <div className="max-w-6xl mx-auto space-y-8 mt-10">
-        
-        {/* Profile Header Card */}
+      
         <div className="bg-white/70 dark:bg-slate-800/50 backdrop-blur-xl border border-white dark:border-slate-700 rounded-[2.5rem] p-8 shadow-xl dark:shadow-none flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 bg-[#6366F1] rounded-[2rem] flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-200 dark:shadow-indigo-900/20">
@@ -172,7 +163,6 @@ export default function ProfilePage() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           
-          {/* Information Column */}
           <div className="space-y-6">
             <div className="bg-white/50 dark:bg-slate-800/40 backdrop-blur-md border border-white dark:border-slate-700 rounded-[2.5rem] p-8 shadow-lg dark:shadow-none">
               <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
@@ -189,8 +179,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
-          {/* Activity Column */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white/60 dark:bg-slate-800/40 backdrop-blur-md border border-white dark:border-slate-700 rounded-[2.5rem] p-8 md:p-10 shadow-lg dark:shadow-none min-h-[500px]">
               <div className="flex items-center justify-between mb-10">

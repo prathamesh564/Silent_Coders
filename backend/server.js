@@ -13,8 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ Database Connected"))
-  .catch(err => console.error("❌ DB Connection Error:", err));
+  .then(() => console.log(" Database Connected"))
+  .catch(err => console.error(" DB Connection Error:", err));
 
 app.use("/api/quiz", quizRouter);
 
@@ -26,4 +26,4 @@ app.get("/api/results", async (req, res) => {
     res.status(500).json({ message: "Error fetching results" });
   }
 });
-app.listen(PORT, () => console.log(`🚀 Server on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(` Server on http://localhost:${PORT}`));

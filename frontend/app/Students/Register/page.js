@@ -33,27 +33,22 @@ export default function StudentRegister() {
 
     setLoading(true);
     try {
-      // 1. Create the Auth User
       const loginID = `${formData.usn.toLowerCase().trim()}@quizmaster.com`;
       const userCredential = await register(loginID, formData.password);
       const user = userCredential.user;
 
-      // 2. Prepare payload matching Dashboard field names
       const profilePayload = {
         uid: user.uid,
         name: formData.name.trim(),
         usn: formData.usn.trim().toUpperCase(),
         college: formData.college.trim(),
-        branch: formData.dept.trim(),   // Dashboard expects 'branch'
-        stream: formData.course.trim(), // Dashboard expects 'stream'
+        branch: formData.dept.trim(),  
+        stream: formData.course.trim(), 
         phoneNumber: formData.phoneNumber.trim(),
-        quizHistory: [],                // Initialize empty for Dashboard stats
+        quizHistory: [],               
         createdAt: new Date().toISOString()
       };
 
-      // 3. Write to "students" collection
-      // Ensure your createRegister function in AuthContext uses: 
-      // setDoc(doc(db, "students", data.uid), data)
       await createRegister(profilePayload); 
       
       router.push("/Students/dashboard");
@@ -67,7 +62,6 @@ export default function StudentRegister() {
     <div className="min-h-screen flex items-center justify-center bg-[#F0F4FF] dark:bg-[#0F172A] p-4 transition-colors duration-300">
       <div className="bg-white dark:bg-[#1E293B] rounded-[2.5rem] shadow-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden border border-white dark:border-slate-700">
         
-        {/* Branding Panel */}
         <div className="md:w-1/2 p-12 bg-white dark:bg-[#1E293B] flex flex-col justify-center">
           <div className="flex items-center gap-2 mb-8">
             <div className="bg-[#6366F1] dark:bg-[#818CF8] p-2 rounded-xl text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-500/20">
@@ -82,7 +76,6 @@ export default function StudentRegister() {
           <p className="text-slate-500 dark:text-slate-400 font-medium">Join thousands of students mastering tech daily.</p>
         </div>
 
-        {/* Form Panel */}
         <div className="md:w-1/2 bg-[#F8FAFF] dark:bg-[#0F172A]/50 p-10 border-l border-slate-100 dark:border-slate-700">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

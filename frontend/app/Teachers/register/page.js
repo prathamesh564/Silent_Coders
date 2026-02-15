@@ -12,10 +12,10 @@ export default function FacultyRegister() {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    facultyId: "", // Changed from usn
+    facultyId: "", 
     name: "",
     dept: "",    
-    designation: "", // Changed from course 
+    designation: "",
     college: "",
     phoneNumber: "",
     password: "",
@@ -35,12 +35,10 @@ export default function FacultyRegister() {
 
     setLoading(true);
     try {
-      // 1. Create the Auth User using Faculty ID as the identifier
       const loginID = `${formData.facultyId.toLowerCase().trim()}@quizmaster.com`;
       const userCredential = await register(loginID, formData.password);
       const user = userCredential.user;
 
-      // 2. Prepare payload matching Faculty profile field names
       const profilePayload = {
         uid: user.uid,
         name: formData.name.trim(),
@@ -49,12 +47,12 @@ export default function FacultyRegister() {
         department: formData.dept.trim(),
         designation: formData.designation.trim(),
         phoneNumber: formData.phoneNumber.trim(),
-        role: "teacher", // Explicitly set role
-        managedQuizzes: [], // Initialize empty for faculty stats
+        role: "teacher", 
+        managedQuizzes: [], 
         createdAt: new Date().toISOString()
       };
 
-      // 3. Write to "faculty" or "teachers" collection
+     
       await createRegister(profilePayload); 
       
       router.push("/Teachers/dashboard");
@@ -69,7 +67,6 @@ export default function FacultyRegister() {
     <div className="min-h-screen flex items-center justify-center bg-[#F0F4FF] dark:bg-[#0F172A] p-4 transition-colors duration-300">
       <div className="bg-white dark:bg-[#1E293B] rounded-[2.5rem] shadow-2xl w-full max-w-5xl flex flex-col md:flex-row overflow-hidden border border-white dark:border-slate-700">
         
-        {/* Branding Panel */}
         <div className="md:w-1/2 p-12 bg-white dark:bg-[#1E293B] flex flex-col justify-center">
           <div className="flex items-center gap-2 mb-8">
             <div className="bg-[#6366F1] dark:bg-[#818CF8] p-2 rounded-xl text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-500/20">
@@ -84,7 +81,6 @@ export default function FacultyRegister() {
           <p className="text-slate-500 dark:text-slate-400 font-medium">Create assessments and track student progress effortlessly.</p>
         </div>
 
-        {/* Form Panel */}
         <div className="md:w-1/2 bg-[#F8FAFF] dark:bg-[#0F172A]/50 p-10 border-l border-slate-100 dark:border-slate-700">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

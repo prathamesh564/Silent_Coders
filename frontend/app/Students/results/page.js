@@ -22,7 +22,6 @@ export default function ResultsPage() {
         
         const data = await response.json();
 
-        // Group entries by username and calculate average percentage
         const userMap = {};
         data.forEach((entry) => {
           if (!userMap[entry.username]) {
@@ -83,7 +82,6 @@ export default function ResultsPage() {
       
       <main className="flex-1 max-w-5xl mx-auto w-full py-12 px-4 space-y-8">
         
-        {/* Error Alert */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/50 p-4 rounded-xl flex items-center gap-3 text-red-500">
             <AlertCircle size={20} />
@@ -91,13 +89,11 @@ export default function ResultsPage() {
           </div>
         )}
 
-        {/* Page Header */}
         <div className="mb-10">
             <h1 className="text-3xl font-bold text-white">Campus Analytics</h1>
             <p className="text-slate-400">Real-time performance tracking and community rankings.</p>
         </div>
 
-        {/* Statistics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <StatCard 
             title="Your Rank" 
@@ -119,7 +115,7 @@ export default function ResultsPage() {
           />
         </div>
 
-        {/* Leaderboard Section */}
+       
         <div className="bg-slate-900/40 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
           <div className="p-8 border-b border-slate-800 bg-slate-900/20 flex justify-between items-center">
             <h2 className="text-xl font-bold text-white flex items-center gap-3">

@@ -32,21 +32,17 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => signOut(auth);
 
-  /**
-   * UPDATED: Fixed collection name and data mapping
-   * This now uses the "students" collection to match security rules and dashboard fetch logic.
-   */
   const createRegister = async (profile) => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error("No user logged in");
 
-    // CRITICAL FIX: Changed "profiles" to "students" to match rules
+    
     const userDocRef = doc(db, "students", uid);
 
     await setDoc(userDocRef, {
       ...profile,
       uid: uid,
-      quizHistory: [], // Initialize for dashboard stats
+      quizHistory: [], 
       createdAt: new Date().toISOString(),
     });
 

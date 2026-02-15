@@ -5,7 +5,7 @@ import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Sun, Moon } from "lucide-react"; // Optional: install lucide-react or use emojis
+import { Sun, Moon } from "lucide-react"; 
 
 function QuizContent() {
   const [questions, setQuestions] = useState([]);
@@ -13,13 +13,12 @@ function QuizContent() {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState(null);
-  const [theme, setTheme] = useState("dark"); // Theme state
+  const [theme, setTheme] = useState("dark"); 
   const router = useRouter();
   
   const searchParams = useSearchParams();
   const topic = searchParams.get("topic") || "General";
 
-  // Handle Theme Persistence
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
@@ -77,7 +76,6 @@ function QuizContent() {
     }
   };
 
-  // Theme-specific styles
   const themeClasses = {
     bg: theme === "dark" ? "bg-[#020617] text-white" : "bg-gray-50 text-gray-900",
     card: theme === "dark" ? "bg-slate-900/50 border-slate-800" : "bg-white border-gray-200 shadow-lg",

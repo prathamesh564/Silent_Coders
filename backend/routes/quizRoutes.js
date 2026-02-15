@@ -14,25 +14,21 @@ router.get("/generate", async (req, res) => {
   try {
     let questions;
     
-    // Normalize the topic: trim spaces and make it lowercase
     const normalizedTopic = topic.trim().toLowerCase();
 
-    // LOGIC: Check static data first
     if (normalizedTopic === "quiz1") {
-      console.log("✅ Serving Static Quiz 1");
+      console.log(" Serving Static Quiz 1");
       questions = staticQuizzes.quiz1;
     } 
     else if (normalizedTopic === "quiz2") {
-      console.log("✅ Serving Static Quiz 2");
+      console.log(" Serving Static Quiz 2");
       questions = staticQuizzes.quiz2;
     } 
     else {
-      // ONLY call Gemini if it is NOT quiz1 or quiz2
-      console.log(`🤖 Calling Gemini for AI Topic: ${topic}`);
+      console.log(` Calling Gemini for AI Topic: ${topic}`);
       questions = await generateAIQuestions(topic);
     }
 
-    // Save session and remove answers for client-side security
     activeQuizzes[userId] = { questions, topic };
     const clientSafeQuestions = questions.map(({ answer, ...rest }) => rest);
     
@@ -42,7 +38,7 @@ router.get("/generate", async (req, res) => {
     res.status(500).json({ error: "Failed to load quiz" });
   }
 });
-// 2. POST: Submit (Remains the same)
+
 router.post("/submit", async (req, res) => {
   const { userId, username, answers } = req.body;
   const session = activeQuizzes[userId];
@@ -83,7 +79,7 @@ router.post("/submit", async (req, res) => {
   }
 });
 
-// 3. GET: Leaderboard (Remains the same)
+
 router.get("/leaderboard", async (req, res) => {
   try {
     const list = await Result.find()

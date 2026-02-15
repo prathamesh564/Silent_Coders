@@ -55,7 +55,6 @@ export default function FacultyProfilePage() {
 
     setLoading(true);
 
-    // 1. Setup Real-time Listener for Faculty Profile
     const profileRef = doc(db, "teachers", user.uid);
     const unsubscribeProfile = onSnapshot(profileRef, (docSnap) => {
       if (docSnap.exists()) {
@@ -78,7 +77,6 @@ export default function FacultyProfilePage() {
       setLoading(false);
     });
 
-    // 2. Fetch Quizzes created by this Faculty
     const fetchQuizzes = async () => {
       try {
         const q = query(collection(db, "quizzes"), where("creatorId", "==", user.uid));
@@ -124,7 +122,6 @@ export default function FacultyProfilePage() {
       <Header/>
       <div className="max-w-6xl mx-auto space-y-8 mt-10">
         
-        {/* Faculty Header Card */}
         <div className="bg-white/70 dark:bg-slate-800/50 backdrop-blur-xl border border-white dark:border-slate-700 rounded-[2.5rem] p-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[2rem] flex items-center justify-center text-white text-3xl font-black shadow-lg">
@@ -156,7 +153,6 @@ export default function FacultyProfilePage() {
 
         <div className="grid lg:grid-cols-3 gap-8">
           
-          {/* Faculty Details */}
           <div className="space-y-6">
             <div className="bg-white/50 dark:bg-slate-800/40 backdrop-blur-md border border-white dark:border-slate-700 rounded-[2.5rem] p-8 shadow-lg">
               <h2 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
@@ -174,7 +170,6 @@ export default function FacultyProfilePage() {
             </div>
           </div>
 
-          {/* Quiz Contributions */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white/60 dark:bg-slate-800/40 backdrop-blur-md border border-white dark:border-slate-700 rounded-[2.5rem] p-8 md:p-10 shadow-lg min-h-[500px]">
               <div className="flex items-center justify-between mb-10">
