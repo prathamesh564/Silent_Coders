@@ -19,10 +19,15 @@ export default function Header() {
           </button>
           
           <button 
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/Students/signup")}
             className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all"
           >
             Sign Up
+          </button> <button 
+            onClick={() => router.push("/Students/profile")}
+            className="bg-indigo-600 hover:bg-emerald-500 text-white px-5 py-2.5 border rounded-full text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all"
+          >
+            Profile
           </button>
         </div>
       </nav>

@@ -32,25 +32,25 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => signOut(auth);
 
+  /**
+   * UPDATED: Fixed collection name and data mapping
+   * This now uses the "students" collection to match security rules and dashboard fetch logic.
+   */
   const createRegister = async (profile) => {
     const uid = auth.currentUser?.uid;
     if (!uid) throw new Error("No user logged in");
 
-    await setDoc(doc(db, "profiles", uid), {
+    // CRITICAL FIX: Changed "profiles" to "students" to match rules
+    const userDocRef = doc(db, "students", uid);
+
+    await setDoc(userDocRef, {
       ...profile,
+      uid: uid,
+      quizHistory: [], // Initialize for dashboard stats
       createdAt: new Date().toISOString(),
     });
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/${uid}/profile`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profile),
-      }
-    );
-
-    return res.json();
+    return { success: true, message: "Student record created successfully" };
   };
 
   return (
@@ -62,7 +62,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-/* ✅ SAFE HOOK */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
