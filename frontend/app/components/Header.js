@@ -1,4 +1,4 @@
-"Use client";
+"use client";
 import { BrainCircuit, Moon, Sun } from "lucide-react";
 import { useRouter } from "next/navigation";
 export default function Header({ isDark, setIsDark }) {
@@ -20,7 +20,7 @@ export default function Header({ isDark, setIsDark }) {
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
 
-          <button className="hidden md:block text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">
+          <button type="button" className="hidden md:block text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white transition-colors">
             Leaderboard
           </button>
           
