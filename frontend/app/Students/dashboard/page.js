@@ -1,151 +1,202 @@
 "use client";
-import Footer from "../../components/Footer";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { auth, db } from "../../core/firebase.js";
+import { doc, getDoc } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+import Header from "../../components/Header";
+import Link from "next/link";
 
 export default function StudentDashboard() {
-  const [student, setStudent] = useState(null);
-  const [quizzes, setQuizzes] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [aiTopic, setAiTopic] = useState(""); 
+ 
+  const router = useRouter();
 
   useEffect(() => {
-  async function fetchData() {
-    const res = await fetch("/api/dashboard");
-    const data = await res.json();
-    setStudent(data.student);
-    setQuizzes(data.quizzes);
-    setLeaderboard(data.leaderboard);
-}
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const docRef = doc(db, "students", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setProfile(docSnap.data());
+        }
+        setLoading(false);
+      } else {
+        router.push("/Students/login");
+      }
+    });
+    return () => unsubscribe();
+  }, [router]);
 
-fetchData();
-  }, []);
+  const startQuiz = (topic) => {
+    let selectedTopic = topic;
+    if (topic === "AI") {
+      selectedTopic = aiTopic.trim() || "General Programming";
+    }
 
-  if (!student) {
+    // Show feedback modal temporarily after starting quiz
+    setShowFeedback(true);
+
+    // Optional: Navigate to quiz page if you want
+    // router.push(`/Students/Quiz?topic=${encodeURIComponent(selectedTopic)}`);
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex flex-col justify-center items-center">
-        <p className="text-xl text-gray-700">Loading...</p>
+      <div className="min-h-screen bg-[#0f172a] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
   return (
-  <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 
-                  dark:from-gray-900 dark:via-gray-800 dark:to-black 
-                  text-gray-900 dark:text-white transition-colors duration-300 flex flex-col">
+    <div className="min-h-screen bg-[#020617] text-slate-200 font-sans flex flex-col">
+      <Header />
 
-    {/* Navbar */}
-    <nav className="flex justify-between items-center px-12 py-6">
-      <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-        🎯 Quiz Master
-      </h1>
+      <div className="flex flex-1">
+        <aside className="w-64 min-h-[calc(100vh-64px)] bg-slate-900/50 border-r border-slate-800 p-6 hidden md:block">
+          <nav className="space-y-4">
+            <NavLink href="#" active>Dashboard</NavLink>
+            <NavLink href="/Students/Quiz">Take Quiz</NavLink>
+            <NavLink href="/Students/results">My Results</NavLink>
+            <NavLink href="/Students/settings">Settings</NavLink>
+          </nav>
+        </aside>
 
-      <Link href="/leaderboard">
-        <button className="bg-indigo-600 text-white px-5 py-2 rounded-xl hover:bg-indigo-700 transition">
-          Leaderboard
-        </button>
-      </Link>
-    </nav>
-
-    {/* Hero Section */}
-    <div className="px-10">
-      <div className="bg-white/40 dark:bg-gray-800/50 backdrop-blur-xl 
-                      rounded-[40px] shadow-2xl p-12">
-
-        <h1 className="text-5xl font-extrabold mb-4">
-          Build your future,
-          <span className="block bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">
-            one insight at a time.
-          </span>
-        </h1>
-
-        <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
-          Welcome back, <span className="font-semibold">{student.name}</span>.
-          Track your progress and climb the leaderboard 🚀
-        </p>
-
-        <div className="flex gap-4">
-          <Link href="/Students/dashboard">
-            <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition">
-              Explore Quizzes
-            </button>
-          </Link>
-
-          <Link href="/leaderboard">
-            <button className="border border-indigo-600 text-indigo-600 dark:text-indigo-400 
-                              px-6 py-3 rounded-xl hover:bg-indigo-50 dark:hover:bg-gray-700 transition">
-              View Leaderboard
-            </button>
-          </Link>
-        </div>
-      </div>
-    </div>
-
-    {/* Content Section */}
-    <div className="flex-1 px-10 mt-12">
-
-      <h2 className="text-3xl font-bold text-center mb-2">
-        Recommended for you
-      </h2>
-
-      <p className="text-center text-gray-600 dark:text-gray-400 mb-10">
-        Based on your quiz performance and activity
-      </p>
-
-      {/* Glass Card */}
-      <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-lg 
-                      rounded-3xl shadow-xl p-10 max-w-4xl mx-auto">
-
-        <div className="mb-8">
-          <h3 className="text-2xl font-semibold mb-2">Your Progress</h3>
-          <p className="text-lg">
-            Score: <b>{student.score}</b> / {student.total}
-          </p>
-        </div>
-
-        {/* Leaderboard */}
-        <div>
-          <h3 className="text-2xl font-semibold mb-4">🏆 Leaderboard</h3>
-
-          {leaderboard.map((user, index) => (
-            <p key={index} className="text-lg">
-              {index + 1}. {user.name} - {user.score}
-            </p>
-          ))}
-        </div>
-      </div>
-
-      {/* Quizzes */}
-      <div className="mb-5 mt-10">
-        <h3 className="text-2xl font-semibold mb-6">Available Quizzes</h3>
-
-        <div className="grid gap-6 md:grid-cols-2">
-          {quizzes.map((quiz) => (
-            <div
-              key={quiz.id}
-              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg
-                        rounded-2xl shadow-lg p-6 hover:shadow-2xl transition"
-            >
-              <h4 className="text-xl font-semibold mb-3">
-                {quiz.title}
-              </h4>
-
-              <Link href={`/Students/Quiz/${quiz.id}`}>
-                <button className="w-full bg-gradient-to-r from-indigo-600 to-pink-500 
-                                  text-white py-2 rounded-xl hover:opacity-90 transition">
-                  Start Quiz 🚀
-                </button>
-              </Link>
+        <main className="flex-1 p-4 md:p-10 bg-[#020617]">
+          <header className="flex justify-between items-center mb-10">
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                Welcome back, {profile?.name?.split(" ")[0]}! 👋
+              </h1>
+              <p className="text-slate-400">Choose a quiz to start your session.</p>
             </div>
-          ))}
-        </div>
+          </header>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl hover:border-blue-500/50 transition-all">
+              <div className="text-2xl mb-2">📚</div>
+              <h3 className="text-lg font-bold text-white">Quiz 1</h3>
+              <p className="text-sm text-slate-400 mb-4">Core JS & Data Structures</p>
+              <button onClick={() => startQuiz("quiz1")} className="w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">Start Quiz</button>
+            </div>
+
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl hover:border-blue-500/50 transition-all">
+              <div className="text-2xl mb-2">⚡</div>
+              <h3 className="text-lg font-bold text-white">Quiz 2</h3>
+              <p className="text-sm text-slate-400 mb-4">React & Backend Concepts</p>
+              <button onClick={() => startQuiz("quiz2")} className="w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition">Start Quiz</button>
+            </div>
+
+            <div className="bg-slate-900/40 border border-purple-500/30 p-6 rounded-2xl hover:border-purple-500/60 transition-all bg-gradient-to-br from-purple-500/5 to-transparent">
+              <div className="text-2xl mb-2">🤖</div>
+              <h3 className="text-lg font-bold text-white">AI Custom Quiz</h3>
+              <input 
+                type="text"
+                placeholder="Topic (e.g. Python, SQL)"
+                value={aiTopic}
+                onChange={(e) => setAiTopic(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 mt-2 mb-3 text-sm focus:border-purple-500 focus:outline-none text-slate-200"
+              />
+              <button onClick={() => startQuiz("AI")} className="w-full py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-semibold transition">Generate AI Quiz</button>
+            </div>
+          </div>
+
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <StatCard title="Quizzes Completed" value={profile?.quizHistory?.length || 0} icon="📝" color="blue" />
+            <StatCard title="Average Score" value={calculateAverage(profile?.quizHistory)} icon="📈" color="green" />
+            <StatCard title="Rank" value="Pro" icon="🏆" color="purple" />
+          </div>
+
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-6">Recent Performance</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-slate-500 border-b border-slate-800">
+                      <th className="pb-4 font-medium">Date</th>
+                      <th className="pb-4 font-medium">Score</th>
+                      <th className="pb-4 font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800">
+                    {profile?.quizHistory?.slice(-5).reverse().map((quiz, i) => (
+                      <tr key={i} className="group hover:bg-slate-800/30 transition">
+                        <td className="py-4 text-slate-300">{new Date(quiz.date).toLocaleDateString()}</td>
+                        <td className="py-4 font-semibold text-blue-400">{quiz.percentage}</td>
+                        <td className="py-4">
+                          <span className="px-3 py-1 bg-green-500/10 text-green-500 rounded-full text-xs">Passed</span>
+                        </td>
+                      </tr>
+                    ))}
+                    {!profile?.quizHistory?.length && (
+                      <tr><td colSpan="3" className="py-10 text-center text-slate-500">No quizzes taken yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6">
+              <h3 className="text-xl font-bold text-white mb-6">Student Info</h3>
+              <div className="space-y-4">
+                <InfoItem label="USN" value={profile?.usn} />
+                <InfoItem label="College" value={profile?.college} />
+                <InfoItem label="Branch" value={profile?.branch} />
+                <InfoItem label="Stream" value={profile?.stream} />
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
 
+      
+      
     </div>
+  );
+}
 
-    <footer className="text-center py-6 text-gray-600 dark:text-gray-400 mt-12">
-      <Footer />
-    </footer>
+// Sub-components
+function NavLink({ href, children, active = false }) {
+  return (
+    <Link href={href} className={`block px-4 py-2 rounded-lg transition-all ${active ? "bg-blue-600 text-white shadow-lg" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}>
+      {children}
+    </Link>
+  );
+}
 
-  </div>
-);
+function StatCard({ title, value, icon, color }) {
+  const colors = {
+    blue: "text-blue-500 bg-blue-500/10",
+    green: "text-green-500 bg-green-500/10",
+    purple: "text-purple-500 bg-purple-500/10"
+  };
+  return (
+    <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl flex items-center gap-4">
+      <div className={`text-2xl p-3 rounded-xl ${colors[color]}`}>{icon}</div>
+      <div>
+        <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">{title}</p>
+        <p className="text-2xl font-bold text-white">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function InfoItem({ label, value }) {
+  return (
+    <div>
+      <p className="text-xs text-slate-500 uppercase font-bold">{label}</p>
+      <p className="text-slate-200">{value || "Not Set"}</p>
+    </div>
+  );
+}
+
+function calculateAverage(history) {
+  if (!history || history.length === 0) return "0%";
+  const sum = history.reduce((acc, curr) => acc + parseFloat(curr.percentage), 0);
+  return (sum / history.length).toFixed(1) + "%";
 }
